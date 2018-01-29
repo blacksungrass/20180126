@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.READ_SMS},1);
         }else{
             if(messages.size()==0){
-                initDatabase();
+                initDatabase();//初始化数据库
             }
         }
 
