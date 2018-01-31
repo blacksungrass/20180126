@@ -27,6 +27,7 @@ public class CustomView extends View {
     private static float mlengthOfWords[];
     private static float mr[];
     private static float maxD;
+    private static float mcorrentLevel;
 
 
     public CustomView(Context context, AttributeSet attrs)
@@ -39,6 +40,7 @@ public class CustomView extends View {
         mheight = dm.heightPixels;
         mstring=new ArrayList<String>();
         mwordSize=35;
+        mcorrentLevel=1;
         Log.d("MyView","one");
 
     }
@@ -86,6 +88,7 @@ public class CustomView extends View {
 
             if(correntWith+mr[i]*2+50>=mwidth)
             {
+                mcorrentLevel++;
                 correntWith=50;
                 correntHight+=mr[i]*2+maxD+50;
             }

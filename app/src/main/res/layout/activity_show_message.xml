@@ -3,22 +3,33 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     android:orientation="vertical">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:background="@android:color/darker_gray"
+        android:visibility="visible"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
+        android:background="@android:color/darker_gray"
         android:gravity="center">
+
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text = "back"
-            android:id = "@+id/back"/>
+            android:id="@+id/back"
+            android:layout_width="66dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/newback"/>
+
         <TextView
+            android:id="@+id/title"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:gravity="center"
-            android:id="@+id/title"/>
+            android:text="123"
+            android:textColor="@android:color/background_dark"/>
+
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

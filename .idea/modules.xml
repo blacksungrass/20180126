@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/20180126.iml" filepath="$PROJECT_DIR$/20180126.iml" />
+      <module fileurl="file://F:\Android\2018winterproject\20180126.iml" filepath="F:\Android\2018winterproject\20180126.iml" />
+      <module fileurl="file://$PROJECT_DIR$/2018winterproject.iml" filepath="$PROJECT_DIR$/2018winterproject.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://F:\Android\2018winterproject\app\app.iml" filepath="F:\Android\2018winterproject\app\app.iml" />
     </modules>
   </component>
 </project>

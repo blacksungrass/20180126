@@ -3,27 +3,38 @@
     android:layout_height = "match_parent"
     android:layout_width = "match_parent"
     android:orientation="vertical">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:background="@android:color/darker_gray"
+        android:visibility="visible"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:background="@color/colorPrimary">
+        android:background="@android:color/darker_gray"
+        android:gravity="center">
+
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text = "back"
-            android:id="@+id/back"/>
+            android:id="@+id/back"
+            android:layout_width="60dp"
+            android:layout_height="50dp"
+            android:background="@drawable/newback"/>
+
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:id="@+id/title"
+            android:layout_width="209dp"
+            android:layout_height="37dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
             android:gravity="center"/>
+
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="new"
-            android:id="@+id/create_new"/>
+            android:id="@+id/create_new"
+            android:layout_width="60dp"
+            android:layout_height="50dp"
+            android:background="@drawable/add"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -32,6 +43,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_gravity="bottom"
             android:id = "@+id/input"/>
         <Button
             android:layout_width="wrap_content"

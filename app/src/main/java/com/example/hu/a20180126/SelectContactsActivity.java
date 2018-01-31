@@ -5,7 +5,9 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -16,6 +18,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 
 import java.util.ArrayList;
@@ -43,6 +46,7 @@ public class SelectContactsActivity extends AppCompatActivity implements View.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_contacts);
+        initScreen();
         bind();
         String tag = getIntent().getStringExtra("tag");
       //从前一个活动传来的原始信息,号码保证无重复
@@ -74,6 +78,25 @@ public class SelectContactsActivity extends AppCompatActivity implements View.On
         back = (Button)findViewById(R.id.back);
         back.setOnClickListener(this);
 
+
+    }
+
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+
+        if (hasFocus && Build.VERSION.SDK_INT >= 21) {
+            View decorView = getWindow().getDecorView();
+            decorView.setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+
+        }
+
+
+
     }
 
 
@@ -98,6 +121,9 @@ public class SelectContactsActivity extends AppCompatActivity implements View.On
         }
     }
 
+
+
+
     @Override
     public void onClick(View v) {
         switch (v.getId()){
@@ -119,4 +145,15 @@ public class SelectContactsActivity extends AppCompatActivity implements View.On
         }
         return contactName;
     }
+
+    private void initScreen(){
+        if (Build.VERSION.SDK_INT >= 21) {
+            View decorView = getWindow().getDecorView();
+            int option = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+            decorView.setSystemUiVisibility(option);
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+        }
+    }
+
 }

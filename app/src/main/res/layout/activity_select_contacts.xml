@@ -3,26 +3,36 @@
     android:layout_height = "match_parent"
     android:layout_width="match_parent"
     android:orientation="vertical">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:background="@android:color/darker_gray"
+        android:visibility="visible"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
+        android:background="@android:color/darker_gray"
         android:gravity="center">
+
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text = "back"
-            android:id = "@+id/back"/>
+            android:id="@+id/back"
+            android:layout_width="65dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/newback"
+            />
+
         <TextView
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:gravity="center"
-            android:text = "选择联系人"/>
+            android:text="选择联系人"/>
+
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text = "back"
+            android:text="back"
             android:visibility="invisible"/>
     </LinearLayout>
     <ScrollView
