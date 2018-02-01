@@ -26,32 +26,23 @@ public class ShowMessageActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_message);
-
         initScreen();
         title = (TextView)findViewById(R.id.title);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         back = (Button)(Button)findViewById(R.id.back);
-
-
-
         String tag,phoneNumber;
         tag = getIntent().getStringExtra("tag");
         phoneNumber = getIntent().getStringExtra("phoneNumber");
         List<Message> messages;
         if(tag==null){
             messages = DataSupport.where("phoneNumber = ?",phoneNumber).find(Message.class);
+            title.setText("选择信息");
         }
         else{
             messages = DataSupport.where("tag = ? and phoneNumber = ?",tag,phoneNumber).find(Message.class);
+            title.setText(tag);
         }
-        Log.d("mydebug", "onCreate: is messages is null? "+String.valueOf(messages==null));
-
         MessageAdapter adapter = new MessageAdapter(messages,tag,this);
-        Log.d("mydebug", "onCreate: adapter is null "+String.valueOf(adapter==null));
-        Log.d("mydebug", "onCreate: recyclerView==null? "+String.valueOf(recyclerView==null));
-
-        title.setText(tag);
-
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         back.setOnClickListener(new View.OnClickListener() {
@@ -88,7 +79,8 @@ public class ShowMessageActivity extends AppCompatActivity {
                 message.setTag(tag);
                 message.save();
             }
-          //  setResult(2);
+            // TODO: 2018/2/2 新建完tag以后最好能在直接回到MainActivity时刷新，显示最新添加的tag 
+            setResult(2);
             finish();
         }
     }

@@ -5,9 +5,11 @@ import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -16,19 +18,43 @@ import java.util.List;
 /**
  * Created by MSI on 2018/1/26.
  */
-
+// TODO: 2018/2/2 还要写一个点击的setOnclickListener 来将点击的自动填到输入框里面
+// TODO: 2018/2/2 要考虑下如果tag太多，level太多以至于页面不够长，放不下的情况
+// TODO: 2018/2/2 要考虑tag非常长的情况下应如何表现
 public class CustomView extends View {
     private Paint mpaint;
     private float mwidth;
     private float mheight;
-    private static List<String> mstring;
-    private static float mwordSize;
-    private static float mnum[];
-    private static float mlengthOfWords[];
-    private static float mr[];
-    private static float maxD;
-    private static float mcorrentLevel;
-
+    private List<String> mstring;
+    private float mwordSize;//字的大小
+    private float mnum[];//tag字符串字数
+    private float mlengthOfWords[];//tag长度
+    private float mr[];//半径
+    private float mx[];//X坐标
+    private float my[];//Y坐标
+    private float maxD;//最大直径
+    private float mcurrentLevel;
+    private OnTagClickListener mListener;
+    public static interface OnTagClickListener{
+        void onClick(String tag);
+    }
+    @Override
+    public boolean onFilterTouchEventForSecurity(MotionEvent event) {
+        if(event.getAction()==MotionEvent.ACTION_DOWN){
+            float x = event.getX();
+            float y = event.getY();
+            for(int i=0;i<mstring.size();i++){
+                float xx = Math.abs(x-mx[i]);
+                float yy = Math.abs(y-my[i]);
+                if(Math.pow(xx,2)+Math.pow(yy,2)<=mr[i]*mr[i]){
+                    if(mListener!=null)
+                        mListener.onClick(mstring.get(i));
+                    break;
+                }
+            }
+        }
+        return true;
+    }
 
     public CustomView(Context context, AttributeSet attrs)
     {
@@ -36,42 +62,46 @@ public class CustomView extends View {
         mpaint=new Paint(Paint.ANTI_ALIAS_FLAG);
         Resources resources = this.getResources();
         DisplayMetrics dm = resources.getDisplayMetrics();
-         mwidth = dm.widthPixels;
+        mwidth = dm.widthPixels;
         mheight = dm.heightPixels;
         mstring=new ArrayList<String>();
         mwordSize=35;
-        mcorrentLevel=1;
+        mcurrentLevel=1;
         Log.d("MyView","one");
 
     }
 
-    public static void addView(List<String> string){
+    public void setOnClickListener(OnTagClickListener listener){
+        mListener = listener;
+    }
 
-       for(int i=string.size()-1;i>=0;i--)
+    public void addView(List<String> string){
+        //我也不确定要不要加这个。。。
+        invalidate();
+        mstring.clear();
+        for(int i=string.size()-1;i>=0;i--)
            mstring.add(string.get(i));
-
-
-        mnum=new float[mstring.size()];
-        mlengthOfWords=new float[mstring.size()];
-        mr=new float[mstring.size()];
-        maxD=0;
+        mnum = new float[mstring.size()];
+        mlengthOfWords = new float[mstring.size()];
+        mr = new float[mstring.size()];
+        maxD = 0;
+        mx = new float[string.size()];
+        my = new float[string.size()];
         Log.d("MyView","two");
     }
 
-    public void removeView(){
-
-    }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
-
         Log.d("CustomView:","three");
+        mpaint.setTextSize(mwordSize);
         for(int i=0;i<mstring.size();i++)
         {
             mnum[i]=mstring.get(i).length();
-            mlengthOfWords[i]=mwordSize*mnum[i];
+            //mlengthOfWords[i]=mwordSize*mnum[i];
+            //长度这样求会有问题，中英文表现不一致，中文还好，英文在圈圈内会偏左，所以我改成用Paint类自带的函数来求字符串长度了
+            mlengthOfWords[i] = mpaint.measureText(mstring.get(i));
             mr[i]=mlengthOfWords[i]*2/3;
             if(maxD<mr[i]*2)
             {
@@ -79,25 +109,26 @@ public class CustomView extends View {
             }
 
         }
-
-        float correntWith=50;
-        float correntHight=50;
-
+        float currentWidth=50;
+        float currentHeight=50;
         for(int i=0;i<mstring.size();i++)
         {
 
-            if(correntWith+mr[i]*2+50>=mwidth)
+            if(currentWidth+mr[i]*2+50>=mwidth)
             {
-                mcorrentLevel++;
-                correntWith=50;
-                correntHight+=mr[i]*2+maxD+50;
+                mcurrentLevel++;
+                currentWidth=50;
+                // TODO: 2018/2/2  为什么还要加mr[i]*2？ 
+                currentHeight+=mr[i]*2+maxD+50;
             }
-                mpaint.setColor(Color.GRAY);
-                canvas.drawCircle(correntWith+mr[i],correntHight+mr[i],mr[i],mpaint);
-                mpaint.setColor(Color.BLACK);
-                mpaint.setTextSize(mwordSize);
-                canvas.drawText(mstring.get(i),correntWith+mr[i]-(mlengthOfWords[i]/2),correntHight+mr[i]+(mwordSize*1/3),mpaint);
-                correntWith+=mr[i]*2+50;
+            mpaint.setColor(Color.GRAY);
+            canvas.drawCircle(currentWidth+mr[i],currentHeight+mr[i],mr[i],mpaint);
+            mx[i] = currentWidth+mr[i];
+            my[i] = currentHeight+mr[i];
+            mpaint.setColor(Color.BLACK);
+
+            canvas.drawText(mstring.get(i),currentWidth+mr[i]-(mlengthOfWords[i]/2),currentHeight+mr[i]+(mwordSize*1/3),mpaint);
+            currentWidth+=mr[i]*2+50;
 
         }
     }
@@ -124,9 +155,7 @@ public class CustomView extends View {
         return mwordSize;
     }
 
-    public static void setMwordSize(float mwordsize) {
-        mwordSize = mwordsize;
-    }
+
 
     public float[] getMnum() {
         return mnum;

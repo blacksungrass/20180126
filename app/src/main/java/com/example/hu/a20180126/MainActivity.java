@@ -45,8 +45,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView title;
     private Button back,createNew,submit;
     private EditText input;
-    private RecyclerView recyclerView;
     private List<String> data;
+    private CustomView customView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,19 +55,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bind();
         //判断数据库是否已经创建
         List<Message> messages = DataSupport.findAll(Message.class);
-        //动态申请权限
-        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_SMS)!= PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.READ_SMS},1);
-        }else{
-            if(messages.size()==0){//如果未初始化数据库
+        //若第一次打开应用
+        if(messages.size()==0){
+            //动态申请权限
+            if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS)!= PackageManager.PERMISSION_GRANTED){
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_SMS},1);
+            }else{
                 initDatabase();//初始化数据库
             }
         }
-
-
-
-        TagAdapter adapter;
-
         Intent intent = getIntent();
         String from = intent.getStringExtra("from");
         //判断这个活动是否由其他活动启动
@@ -75,71 +71,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             activityTitle = "标签";
             title.setText(activityTitle);
             submit.setText("搜索");
-
         }
         else {
             List<String> data = intent.getStringArrayListExtra("tags");
             createNew.setVisibility(View.INVISIBLE);
             createNew.setEnabled(false);
-            activityTitle = "输入标签。。";
+            activityTitle = "请输入标签。。";
             title.setText(activityTitle);
             submit.setText("确认");
         }
-       // DataSupport.deleteAll(Message.class);
-        messages = DataSupport.where("tag != ?","").find(Message.class);
-        Map<String,Integer> map = new TreeMap<>();
-        for(Message m:messages){
-            if(!map.containsKey(m.tag)){
-                map.put(m.tag,1);
-            }
-            else{
-                int t = map.get(m.tag);
-                map.put(m.tag,t+1);
-            }
-        }
-        List<Map.Entry<String,Integer>> t = new ArrayList<>();
-        t.addAll(map.entrySet());
-        Collections.sort(t,new Comparator<Map.Entry<String,Integer>>(){
-            @Override
-            public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
-                return o2.getValue().compareTo(o1.getValue());
-            }
-        });
-
-        data = new ArrayList<>();
-        for(Map.Entry<String,Integer> i:t){
-            data.add(i.getKey());
-        }
-
-        CustomView.addView(data);
-
-/*
-        adapter = new TagAdapter(data,input);
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));*/
-
-
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-
-       //CustomView.addView(data);
+        //将所有的tag按照出现的次数保存在list中
+        List<String> data = getTagList();
+        customView.addView(data);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-            switch (requestCode){
-                case 1:
-                    if(grantResults.length>0&&grantResults[0]==PackageManager.PERMISSION_GRANTED){
+        switch (requestCode){
+            case 1:
+                if(grantResults.length>0&&grantResults[0]==PackageManager.PERMISSION_GRANTED){
                         initDatabase();
-                    }
-                    else{
-                        finish();
-                    }
+                }
+                else{
+                    Toast.makeText(this,"无权限读取短信，请开放权限",Toast.LENGTH_SHORT).show();
+                    finish();
+                }
             }
         }
 
@@ -162,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     args.add(i);
                 }
                 intent.putExtra("data",(Serializable)args);
-                startActivity(intent);
+                startActivityForResult(intent,1);
                 break;
             case R.id.submit:
                 if(input.getText().length()==0)
@@ -170,12 +127,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(this,"标签名不能为空",Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if(activityTitle=="输入标签。。") {
+                if(activityTitle=="请输入标签。。") {
                     Intent ret = new Intent();
                     ret.putExtra("tag", input.getText().toString());
                     setResult(2, ret);
-                   Message message=new Message();
-                   message.setTag(input.getText().toString());
                     finish();
                 }
                 else{
@@ -202,17 +157,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         createNew = (Button)findViewById(R.id.create_new);
         submit = (Button)findViewById(R.id.submit);
         input = (EditText)findViewById(R.id.input);
-        recyclerView = (RecyclerView)findViewById(R.id.recyclerView);
         title = (TextView)findViewById(R.id.title);
-
+        customView = (CustomView)findViewById(R.id.custom_view);
+        customView.setOnClickListener(new CustomView.OnTagClickListener() {
+            @Override
+            public void onClick(String tag) {
+                input.setText(tag);
+                input.setSelection(input.getText().toString().length());
+            }
+        });
         back.setOnClickListener(this);
         createNew.setOnClickListener(this);
         submit.setOnClickListener(this);
 
     }
+    //读取系统短信数据库并保存到本应用数据库中
+    // TODO: 2018/2/2 这里最好修改一下只讲接受到的信息存入系统数据库？还是在应用的数据库中再添加一个字段表示是发送的短信还是接受的短信
     private void initDatabase()
     {
-        //--------------------------------------------------------------------------------
         ContentResolver cr = getContentResolver();
         Cursor cur  = cr.query(Uri.parse("content://sms/"),null,null,null,null);
         while(cur.moveToNext())
@@ -228,6 +190,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
+    //去掉标题栏
     private void initScreen(){
         if (Build.VERSION.SDK_INT >= 21) {
             View decorView = getWindow().getDecorView();
@@ -238,6 +201,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode==2){
+            customView.addView(getTagList());
+        }
+    }
+    private List<String> getTagList(){
+        List<Message> messages = DataSupport.where("tag != ?","").find(Message.class);
+        Map<String,Integer> map = new TreeMap<>();
+        for(Message m:messages){
+            if(!map.containsKey(m.getTag())){
+                map.put(m.getTag(),1);
+            }
+            else{
+                int t = map.get(m.getTag());
+                map.put(m.getTag(),t+1);
+            }
+        }
+        List<Map.Entry<String,Integer>> t = new ArrayList<>();
+        t.addAll(map.entrySet());
+        Collections.sort(t,new Comparator<Map.Entry<String,Integer>>(){
+            @Override
+            public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+                return o2.getValue().compareTo(o1.getValue());
+            }
+        });
+        data = new ArrayList<>();
+        for(Map.Entry<String,Integer> i:t){
+            data.add(i.getKey());
+        }
+        return data;
+    }
 }

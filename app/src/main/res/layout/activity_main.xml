@@ -24,7 +24,7 @@
 
         <TextView
             android:id="@+id/title"
-            android:layout_width="209dp"
+            android:layout_width="0dp"
             android:layout_height="37dp"
             android:layout_weight="1"
             android:background="@android:color/transparent"
@@ -44,15 +44,15 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_gravity="bottom"
-            android:id = "@+id/input"/>
+            android:id = "@+id/input"
+            android:maxLines="1"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id = "@+id/submit"/>
     </LinearLayout>
     <com.example.hu.a20180126.CustomView
+        android:id = "@+id/custom_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
-
-
 </LinearLayout>

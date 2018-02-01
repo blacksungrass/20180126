@@ -28,7 +28,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="选择联系人"/>
-
+        <!--纯粹占位子的，方便让标题居中-->
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

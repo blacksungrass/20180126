@@ -55,9 +55,7 @@ public class ContectAdapter extends RecyclerView.Adapter<ContectAdapter.ViewHold
                 public void onClick(View v) {
                     Intent intent = new Intent(activity,ShowMessageActivity.class);
                     intent.putExtra("phoneNumber",list2.get(position));
-                    activity.setResult(Activity.RESULT_OK,intent);
                     activity.startActivityForResult(intent,1);
-                    activity.finish();
                 }
             });
         }
@@ -68,9 +66,7 @@ public class ContectAdapter extends RecyclerView.Adapter<ContectAdapter.ViewHold
                     Intent intent = new Intent(activity,ShowMessageActivity.class);
                     intent.putExtra("phoneNumber",list2.get(position));
                     intent.putExtra("tag",tag);
-                    activity.setResult(Activity.RESULT_OK,intent);
-                    activity.startActivityForResult(intent,2);
-                    activity.finish();
+                    activity.startActivity(intent);
                 }
             });
         }
