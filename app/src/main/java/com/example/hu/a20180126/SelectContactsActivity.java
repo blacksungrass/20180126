@@ -35,6 +35,7 @@ public class SelectContactsActivity extends AppCompatActivity implements View.On
     private List<String> rawData;
     private  List<String> data;
     private  List<String> rdata;
+    private String tag;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -49,11 +50,12 @@ public class SelectContactsActivity extends AppCompatActivity implements View.On
         setContentView(R.layout.activity_select_contacts);
         initScreen();
         bind();
-        String tag = getIntent().getStringExtra("tag");
+         tag= getIntent().getStringExtra("tag");
         //从前一个活动传来的原始信息,号码保证无重复
         rawData = (List<String>)getIntent().getSerializableExtra("data");
         data = new ArrayList<>();
         rdata = new ArrayList<>();
+
 
         //动态申请权限
         if(ContextCompat.checkSelfPermission(SelectContactsActivity.this, Manifest.permission.READ_CONTACTS)!= PackageManager.PERMISSION_GRANTED){
@@ -61,20 +63,23 @@ public class SelectContactsActivity extends AppCompatActivity implements View.On
         }else{
             //两个循环是为了让在通讯录中的号码优先显示
             for(String i:rawData){
-                String t = getDisplayNameByNumber(i);
+                String t= getDisplayNameByNumber(i);
+
                 if(!"".equals(t)){
                     data.add(t);
                     rdata.add(i);
                 }
             }
             for(String i:rawData){
-                String t = getDisplayNameByNumber(i);
+                String t= getDisplayNameByNumber(i);
                 if("".equals(t)){
                     data.add(i);
                     rdata.add(i);
                 }
             }
         }
+
+
         // TODO: 2018/2/2  试验下动态权限申请是否是异步的 
         recyclerView.setAdapter(new ContectAdapter(data,rdata,this,tag));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -88,21 +93,7 @@ public class SelectContactsActivity extends AppCompatActivity implements View.On
     //http://blog.csdn.net/guolin_blog/article/details/51763825
     //学到了，我的手机版本太低，我说怎么看不出来。。
     //btw：为啥MainActivity里面没有这个函数，第一个不需要沉浸式嘛。。
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        if (hasFocus && Build.VERSION.SDK_INT >= 21) {
-            View decorView = getWindow().getDecorView();
-            decorView.setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-            getWindow().setStatusBarColor(Color.TRANSPARENT);
-
-        }
-
-
-
-    }
+    //这个重载好像没有用了，额，忘删了，用了initScreen这个函数
 
 
     @Override
@@ -111,14 +102,25 @@ public class SelectContactsActivity extends AppCompatActivity implements View.On
         switch (requestCode){
             case 2:
                 if(grantResults.length>0&&grantResults[0]==PackageManager.PERMISSION_GRANTED){
+                    // TODO: 2018/2/2  不是要两个foreach吗
                     for(String i:rawData){
-                        rdata.add(i);
-                        String t =getDisplayNameByNumber(i);
-                        if(!"".equals(t))
+                        String t= getDisplayNameByNumber(i);
+
+                        if(!"".equals(t)){
                             data.add(t);
-                        else
-                            data.add(i);
+                            rdata.add(i);
+                        }
                     }
+                    for(String i:rawData){
+                            String t= getDisplayNameByNumber(i);
+                        if("".equals(t)){
+                            data.add(i);
+                            rdata.add(i);
+                        }
+                    }
+                    // TODO: 2018/2/2  允许读取联系人后加载界面
+                    recyclerView.setAdapter(new ContectAdapter(data,rdata,this,tag));
+                    recyclerView.setLayoutManager(new LinearLayoutManager(this));
                 }
                 else{
                     Toast.makeText(this,"无权限读取通讯录，请开放权限",Toast.LENGTH_SHORT).show();
@@ -140,7 +142,6 @@ public class SelectContactsActivity extends AppCompatActivity implements View.On
     }
 
     // TODO: 2018/1/31 报告说有些号码在通讯录中有保存的短信还是显示不了，是否是这个函数的问题 
-    // TODO: 2018/2/2  要囊括sim卡的短信
     public String getDisplayNameByNumber(String phoneNum) {
         String contactName = "";
         ContentResolver cr = getContentResolver();
@@ -156,14 +157,14 @@ public class SelectContactsActivity extends AppCompatActivity implements View.On
             return contactName;
         pCur = cr.query(Uri.parse("content://icc/adn"),null,"number = ?",new String[]{phoneNum},null);
         if(pCur!=null&&pCur.moveToFirst()){
-            contactName = pCur .getString(pCur.getColumnIndex("name"));
+            contactName = pCur .getString(pCur.getColumnIndex("tag"));
             pCur.close();
         }
         if(!"".equals(contactName))
             return contactName;
         pCur = cr.query(Uri.parse("content://sim/adn"),null,"number = ?",new String[]{phoneNum},null);
         if(pCur!=null&&pCur.moveToFirst()){
-            contactName = pCur .getString(pCur.getColumnIndex("name"));
+            contactName = pCur .getString(pCur.getColumnIndex("tag"));
             pCur.close();
         }
         return contactName;
