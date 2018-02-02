@@ -18,7 +18,7 @@
 
         <Button
             android:id="@+id/back"
-            android:layout_width="60dp"
+            android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@drawable/newback"/>
 
@@ -32,24 +32,34 @@
 
         <Button
             android:id="@+id/create_new"
-            android:layout_width="60dp"
+            android:layout_width="55dp"
             android:layout_height="50dp"
             android:background="@drawable/add"/>
     </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="45dp"
+        android:background="@drawable/newsearch">
+
         <EditText
+            android:id="@+id/input"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_height="match_parent"
             android:layout_gravity="bottom"
-            android:id = "@+id/input"
-            android:maxLines="1"/>
+            android:layout_marginLeft="15dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:maxLines="1"
+            android:textCursorDrawable="@drawable/color_cursor"/>
+
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id = "@+id/submit"/>
+            android:id="@+id/submit"
+            android:layout_width="55dp"
+            android:layout_height="45dp"
+            android:layout_gravity="center"
+            android:background="@drawable/findstate"
+            android:textSize="10sp"/>
     </LinearLayout>
     <com.example.hu.a20180126.CustomView
         android:id = "@+id/custom_view"

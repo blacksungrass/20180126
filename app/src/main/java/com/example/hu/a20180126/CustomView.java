@@ -11,6 +11,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,11 @@ public class CustomView extends View {
     private float mx[];//X坐标
     private float my[];//Y坐标
     private float maxD;//最大直径
-    private float mcurrentLevel;
+    private  float maxnum;
+    private float mleveleachwords[];
+    private String addstring[];
+    private float currentWidth,currentHeight;
+    private boolean isadd;
     private OnTagClickListener mListener;
     public static interface OnTagClickListener{
         void onClick(String tag);
@@ -66,7 +71,8 @@ public class CustomView extends View {
         mheight = dm.heightPixels;
         mstring=new ArrayList<String>();
         mwordSize=35;
-        mcurrentLevel=1;
+        maxnum=4;
+
         Log.d("MyView","one");
 
     }
@@ -79,14 +85,17 @@ public class CustomView extends View {
         //我也不确定要不要加这个。。。
         invalidate();
         mstring.clear();
+        isadd=false;
         for(int i=string.size()-1;i>=0;i--)
            mstring.add(string.get(i));
         mnum = new float[mstring.size()];
         mlengthOfWords = new float[mstring.size()];
         mr = new float[mstring.size()];
         maxD = 0;
-        mx = new float[string.size()];
-        my = new float[string.size()];
+        mx = new float[mstring.size()];
+        my = new float[mstring.size()];
+        mleveleachwords=new float[mstring.size()];
+        addstring=new String[mstring.size()];
         Log.d("MyView","two");
     }
 
@@ -95,42 +104,81 @@ public class CustomView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         Log.d("CustomView:","three");
+
+
+        currentHeight=50;
+        currentWidth=50;
         mpaint.setTextSize(mwordSize);
         for(int i=0;i<mstring.size();i++)
         {
             mnum[i]=mstring.get(i).length();
             //mlengthOfWords[i]=mwordSize*mnum[i];
             //长度这样求会有问题，中英文表现不一致，中文还好，英文在圈圈内会偏左，所以我改成用Paint类自带的函数来求字符串长度了
-            mlengthOfWords[i] = mpaint.measureText(mstring.get(i));
-            mr[i]=mlengthOfWords[i]*2/3;
+           if(mnum[i]>maxnum)
+                { //大于maxnum个字就换行
+                    int num=(int)mnum[i]/2;
+                mlengthOfWords[i] = mpaint.measureText(mstring.get(i))/2;
+                    mr[i]=mlengthOfWords[i]*3/4;
+                   float len=mstring.get(i).length();
+                   String s="";
+                    int count=0;
+                    for(int j=0;j<len;)
+                    {
+                        if(j+num>=len)
+                        {
+                            s+=mstring.get(i).substring(j,(int)len);
+                            count++;
+                            break;
+                        }
+                        else{
+                            // TODO: 2018/2/2   加换行符
+                            s+=mstring.get(i).substring(j,j+num)+"$";
+                            j+=num;
+                           count++;
+                        }
+                    }
+                    mleveleachwords[i]=count;
+                    addstring[i]=s;
+                }
+           else{
+               mlengthOfWords[i]=mpaint.measureText(mstring.get(i));
+               mr[i]=mlengthOfWords[i]*2/3;
+               addstring[i]=mstring.get(i);
+           }
+
             if(maxD<mr[i]*2)
             {
                 maxD=mr[i]*2;
             }
 
         }
-        float currentWidth=50;
-        float currentHeight=50;
+     //   Toast.makeText(getContext(), mstring.get(0)+"length is:"+mnum[0], Toast.LENGTH_LONG).show();
+
         for(int i=0;i<mstring.size();i++)
         {
 
             if(currentWidth+mr[i]*2+50>=mwidth)
             {
-                mcurrentLevel++;
+
                 currentWidth=50;
-                // TODO: 2018/2/2  为什么还要加mr[i]*2？ 
-                currentHeight+=mr[i]*2+maxD+50;
+                // TODO: 2018/2/2  为什么还要加mr[i]*2？
+                // TODO: 2018/2/2  手抖了下,还是有些问题，继续优化
+                currentHeight+=maxD+50;
             }
             mpaint.setColor(Color.GRAY);
-            canvas.drawCircle(currentWidth+mr[i],currentHeight+mr[i],mr[i],mpaint);
+            canvas.drawCircle(currentWidth+mr[i],currentHeight+mr[i],mr[i]+mleveleachwords[i]*5,mpaint);
             mx[i] = currentWidth+mr[i];
             my[i] = currentHeight+mr[i];
             mpaint.setColor(Color.BLACK);
-
-            canvas.drawText(mstring.get(i),currentWidth+mr[i]-(mlengthOfWords[i]/2),currentHeight+mr[i]+(mwordSize*1/3),mpaint);
+            if(mleveleachwords[i]!=0)
+            canvas.drawText(addstring[i],currentWidth+mr[i]-(mlengthOfWords[i]/2),currentHeight+mr[i]-(mleveleachwords[i]*4),mpaint);
+            else{
+                canvas.drawText(addstring[i],currentWidth+mr[i]-(mlengthOfWords[i]/2),currentHeight+mr[i]+(mwordSize*1/3),mpaint);
+            }
             currentWidth+=mr[i]*2+50;
 
         }
+
     }
 
 

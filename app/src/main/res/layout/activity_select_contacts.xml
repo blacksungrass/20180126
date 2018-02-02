@@ -17,8 +17,8 @@
 
         <Button
             android:id="@+id/back"
-            android:layout_width="65dp"
-            android:layout_height="match_parent"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:background="@drawable/newback"
             />
 
@@ -30,8 +30,8 @@
             android:text="选择联系人"/>
         <!--纯粹占位子的，方便让标题居中-->
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:text="back"
             android:visibility="invisible"/>
     </LinearLayout>

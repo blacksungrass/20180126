@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(from==null){
             activityTitle = "标签";
             title.setText(activityTitle);
-            submit.setText("搜索");
+           // submit.setText("搜索");
         }
         else {
             List<String> data = intent.getStringArrayListExtra("tags");
@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             createNew.setEnabled(false);
             activityTitle = "请输入标签。。";
             title.setText(activityTitle);
+            submit.setBackgroundResource(R.drawable.okstate);
             submit.setText("确认");
         }
         //将所有的tag按照出现的次数保存在list中
@@ -190,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    //去掉标题栏
+    //布局全屏化并把状态栏设为透明
     private void initScreen(){
         if (Build.VERSION.SDK_INT >= 21) {
             View decorView = getWindow().getDecorView();

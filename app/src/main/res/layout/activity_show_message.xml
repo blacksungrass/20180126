@@ -17,8 +17,8 @@
 
         <Button
             android:id="@+id/back"
-            android:layout_width="66dp"
-            android:layout_height="match_parent"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:background="@drawable/newback"/>
 
         <TextView
@@ -31,8 +31,8 @@
             android:textColor="@android:color/background_dark"/>
         <!--占位子用的-->
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:visibility="invisible"/>
     </LinearLayout>
     <ScrollView
