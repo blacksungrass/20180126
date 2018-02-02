@@ -118,7 +118,8 @@ public class CustomView extends View {
                 count++;
             }
             Log.d("mydebug", "onDraw: count = "+String.valueOf(count));
-            mtextWidth[i] = mpaint.measureText(mstring.get(i))/count;
+            //宽度限制放宽一个汉字的宽度（两个英文字符）
+            mtextWidth[i] = mpaint.measureText(mstring.get(i))/count+mpaint.measureText("  ");
             Log.d("mydebug", "onDraw: mtextWidth[i] = "+String.valueOf(mtextWidth[i]));
             mtextHeight[i] = (textPaint.getFontMetrics().bottom-textPaint.getFontMetrics().top)*count;
             Log.d("mydebug", "onDraw: mtextHeight[i] = "+String.valueOf(mtextHeight[i]));
