@@ -19,10 +19,6 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by MSI on 2018/1/26.
- */
-// TODO: 2018/2/2 还要写一个点击的setOnclickListener 来将点击的自动填到输入框里面
 // TODO: 2018/2/2 要考虑下如果tag太多，level太多以至于页面不够长，放不下的情况
 // TODO: 2018/2/2 要考虑tag非常长的情况下应如何表现
 public class CustomView extends View {
@@ -42,7 +38,7 @@ public class CustomView extends View {
     private float currentWidth,currentHeight;
     private static TextPaint textPaint;
     private OnTagClickListener mListener;
-    public static interface OnTagClickListener{
+    public interface OnTagClickListener{
         void onClick(String tag);
     }
     @Override
@@ -72,7 +68,7 @@ public class CustomView extends View {
         DisplayMetrics dm = resources.getDisplayMetrics();
         mwidth = dm.widthPixels;
         mheight = dm.heightPixels;
-        mstring=new ArrayList<String>();
+        mstring=new ArrayList<>();
         mwordSize=35;
         maxnum=4;
 

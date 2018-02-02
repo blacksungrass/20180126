@@ -30,6 +30,7 @@ import org.litepal.LitePal;
 import org.litepal.crud.DataSupport;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         Intent intent = getIntent();
-        String from = intent.getStringExtra("from");
+        final String from = intent.getStringExtra("from");
         //判断这个活动是否由其他活动启动
         if(from==null){
             activityTitle = "标签";
@@ -81,6 +82,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             submit.setBackgroundResource(R.drawable.okstate);
             submit.setText("确认");
         }
+        customView.setOnClickListener(new CustomView.OnTagClickListener() {
+            @Override
+            public void onClick(String tag) {
+                input.setText(tag);
+                input.setSelection(input.getText().toString().length());
+                if(from==null){
+                    submit.callOnClick();
+                }
+            }
+        });
         //将所有的tag按照出现的次数保存在list中
         List<String> data = getTagList();
         customView.addView(data);
@@ -160,13 +171,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         input = (EditText)findViewById(R.id.input);
         title = (TextView)findViewById(R.id.title);
         customView = (CustomView)findViewById(R.id.custom_view);
-        customView.setOnClickListener(new CustomView.OnTagClickListener() {
-            @Override
-            public void onClick(String tag) {
-                input.setText(tag);
-                input.setSelection(input.getText().toString().length());
-            }
-        });
         back.setOnClickListener(this);
         createNew.setOnClickListener(this);
         submit.setOnClickListener(this);
@@ -178,13 +182,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     {
         ContentResolver cr = getContentResolver();
         Cursor cur  = cr.query(Uri.parse("content://sms/"),null,null,null,null);
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd E HH:mm");
         while(cur.moveToNext())
         {
             String address = cur.getString(cur.getColumnIndex("address"));
             String body = cur.getString(cur.getColumnIndex("body"));
+            long date = cur.getLong(cur.getColumnIndex("date"));
             Message message = new Message();
             message.setPhoneNumber(address);
             message.setContent(body);
+            message.setDate(sdf.format(date));
             message.save();
         }
         cur.close();
