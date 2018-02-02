@@ -15,6 +15,15 @@ public class Message extends DataSupport{
     private String content;
     private String tag;
     private String place;
+    private String date;
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
 
     public String getPhoneNumber() {
         return phoneNumber;

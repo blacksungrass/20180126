@@ -140,6 +140,7 @@ public class SelectContactsActivity extends AppCompatActivity implements View.On
     }
 
     // TODO: 2018/1/31 报告说有些号码在通讯录中有保存的短信还是显示不了，是否是这个函数的问题 
+    // TODO: 2018/2/2  要囊括sim卡的短信
     public String getDisplayNameByNumber(String phoneNum) {
         String contactName = "";
         ContentResolver cr = getContentResolver();
@@ -147,8 +148,22 @@ public class SelectContactsActivity extends AppCompatActivity implements View.On
                 ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
                 ContactsContract.CommonDataKinds.Phone.NUMBER + " = ?",
                 new String[] { phoneNum }, null);
-        if (pCur.moveToFirst()) {
+        if (pCur!=null&&pCur.moveToFirst()) {
             contactName = pCur .getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+            pCur.close();
+        }
+        if(!"".equals(contactName))
+            return contactName;
+        pCur = cr.query(Uri.parse("content://icc/adn"),null,"number = ?",new String[]{phoneNum},null);
+        if(pCur!=null&&pCur.moveToFirst()){
+            contactName = pCur .getString(pCur.getColumnIndex("name"));
+            pCur.close();
+        }
+        if(!"".equals(contactName))
+            return contactName;
+        pCur = cr.query(Uri.parse("content://sim/adn"),null,"number = ?",new String[]{phoneNum},null);
+        if(pCur!=null&&pCur.moveToFirst()){
+            contactName = pCur .getString(pCur.getColumnIndex("name"));
             pCur.close();
         }
         return contactName;

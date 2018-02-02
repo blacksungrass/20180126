@@ -59,7 +59,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
 
-        initDate(holder);
+        //initDate(holder);
+        holder.mtimeanddate.setText(messages.get(position).getDate());
         holder.mmessage.setText(messages.get(position).getContent());
         if(tag!=null)
             return;

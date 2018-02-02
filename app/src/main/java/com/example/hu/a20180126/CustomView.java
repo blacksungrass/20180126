@@ -15,7 +15,6 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
 
-
 // TODO: 2018/2/2 要考虑下如果tag太多，level太多以至于页面不够长，放不下的情况
 // TODO: 2018/2/2 要考虑tag非常长的情况下应如何表现
 public class CustomView extends View {
