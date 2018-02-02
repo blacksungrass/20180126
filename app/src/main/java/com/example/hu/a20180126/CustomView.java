@@ -38,7 +38,6 @@ public class CustomView extends View {
     private float mleveleachwords[];
     private String addstring[];
     private float currentWidth,currentHeight;
-    private boolean isadd;
     private OnTagClickListener mListener;
     public static interface OnTagClickListener{
         void onClick(String tag);
@@ -85,7 +84,6 @@ public class CustomView extends View {
         //我也不确定要不要加这个。。。
         invalidate();
         mstring.clear();
-        isadd=false;
         for(int i=string.size()-1;i>=0;i--)
            mstring.add(string.get(i));
         mnum = new float[mstring.size()];
