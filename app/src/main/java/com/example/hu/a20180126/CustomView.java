@@ -32,9 +32,10 @@ public class CustomView extends View {
     private float mr[];//半径
     private float mx[];//X坐标
     private float my[];//Y坐标
+    private float mtextWidth[];//字符串所占据的矩形宽度
+    private float mtextHeight[];//字符串所占据的矩形高度
     private float maxD;//最大直径
     private  float maxnum;
-    private float mleveleachwords[];
     private float currentWidth,currentHeight;
     private static TextPaint textPaint;
     private OnTagClickListener mListener;
@@ -71,7 +72,6 @@ public class CustomView extends View {
         mstring=new ArrayList<>();
         mwordSize=35;
         maxnum=4;
-
         Log.d("MyView","one");
 
     }
@@ -92,7 +92,8 @@ public class CustomView extends View {
         maxD = 0;
         mx = new float[mstring.size()];
         my = new float[mstring.size()];
-        mleveleachwords=new float[mstring.size()];
+        mtextHeight = new float[mstring.size()];
+        mtextWidth = new float[mstring.size()];
         Log.d("MyView","two");
     }
 
@@ -101,78 +102,49 @@ public class CustomView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         Log.d("CustomView:","three");
-
-
         currentHeight=50;
         currentWidth=50;
+        textPaint.setColor(Color.BLACK);
+        textPaint.setTextSize(mwordSize);
+        textPaint.setAntiAlias(true);
         mpaint.setTextSize(mwordSize);
         for(int i=0;i<mstring.size();i++)
         {
-            mnum[i]=mstring.get(i).length();
-            //mlengthOfWords[i]=mwordSize*mnum[i];
-            //长度这样求会有问题，中英文表现不一致，中文还好，英文在圈圈内会偏左，所以我改成用Paint类自带的函数来求字符串长度了
-           if(mnum[i]>maxnum)
-                { //大于maxnum个字就换行
-                    int num=(int)mnum[i];
-                    int count=1;
-                    do{
-                        num=num/2;
-                        count++;
-                    }
-                    while(num>maxnum);
-
-                    mleveleachwords[i]=count;
-                mlengthOfWords[i] = mpaint.measureText(mstring.get(i))/mleveleachwords[i];
-                    mr[i]=mlengthOfWords[i]*3/4;
-                }
-           else{
-               mlengthOfWords[i]=mpaint.measureText(mstring.get(i));
-               mr[i]=mlengthOfWords[i]*2/3;
-
-           }
-
+            mnum[i] = mstring.get(i).length();
+            int num = (int)mnum[i];
+            int count = 1;
+            while(num>maxnum){
+                num /= 2;
+                count++;
+            }
+            Log.d("mydebug", "onDraw: count = "+String.valueOf(count));
+            mtextWidth[i] = mpaint.measureText(mstring.get(i))/count;
+            Log.d("mydebug", "onDraw: mtextWidth[i] = "+String.valueOf(mtextWidth[i]));
+            mtextHeight[i] = (textPaint.getFontMetrics().bottom-textPaint.getFontMetrics().top)*count;
+            Log.d("mydebug", "onDraw: mtextHeight[i] = "+String.valueOf(mtextHeight[i]));
+            mr[i] = Math.max(mtextHeight[i],mtextWidth[i])*0.8F;
+            Log.d("mydebug", "onDraw: mr[i] = "+String.valueOf(mr[i]));
             if(maxD<mr[i]*2)
             {
-                maxD=mr[i]*2;
+                    maxD=mr[i]*2;
             }
-
         }
-     //   Toast.makeText(getContext(), mstring.get(0)+"length is:"+mnum[0], Toast.LENGTH_LONG).show();
-
         for(int i=0;i<mstring.size();i++)
         {
-
-            if(currentWidth+mr[i]*2+50>=mwidth)
+            if(currentWidth+mr[i]*2+50>mwidth)
             {
-
                 currentWidth=50;
-                // TODO: 2018/2/2  为什么还要加mr[i]*2？
-                // TODO: 2018/2/2  手抖了下,还是有些问题，继续优化
                 currentHeight+=maxD+50;
             }
             mpaint.setColor(Color.GRAY);
-            canvas.drawCircle(currentWidth+mr[i]+mleveleachwords[i]*5,currentHeight+mr[i]+mleveleachwords[i]*5,mr[i]+mleveleachwords[i]*5,mpaint);
+            canvas.drawCircle(currentWidth+mr[i],currentHeight+mr[i],mr[i],mpaint);
             mx[i] = currentWidth+mr[i];
             my[i] = currentHeight+mr[i];
-            textPaint.setColor(Color.BLACK);
-            textPaint.setTextSize(mwordSize);
-           textPaint.setAntiAlias(true);
-
-            if(mleveleachwords[i]!=0) {
-
-                StaticLayout layout = new StaticLayout(mstring.get(i), textPaint, (int) mlengthOfWords[i] , Layout.Alignment.ALIGN_NORMAL, 1.0F, 0.0F, true);
-                canvas.save();
-                canvas.translate(currentWidth+mr[i]-(mlengthOfWords[i]/3),currentHeight+(mr[i]-(mleveleachwords[i]*mwordSize*2/3)));//从100，100开始画
-                layout.draw(canvas);
-                canvas.restore();//别忘了restore
-            }
-            else{
-                StaticLayout layout = new StaticLayout(mstring.get(i), textPaint, (int) mlengthOfWords[i], Layout.Alignment.ALIGN_NORMAL, 1.0F, 0.0F, true);
-                canvas.save();
-                canvas.translate(currentWidth+mr[i]-(mlengthOfWords[i]/2),currentHeight+(mr[i]-mwordSize*2/3));//从100，100开始画
-                layout.draw(canvas);
-                canvas.restore();//别忘了restore
-            }
+            StaticLayout layout = new StaticLayout(mstring.get(i), textPaint, (int) mtextWidth[i] , Layout.Alignment.ALIGN_CENTER, 1.0F, 0.0F, true);
+            canvas.save();
+            canvas.translate(currentWidth+mr[i]-mtextWidth[i]/2,currentHeight+mr[i]-mtextHeight[i]/2);
+            layout.draw(canvas);
+            canvas.restore();
             currentWidth+=mr[i]*2+50;
         }
 
