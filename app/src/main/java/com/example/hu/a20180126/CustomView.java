@@ -6,6 +6,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.annotation.Nullable;
+import android.text.Layout;
+import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -36,8 +39,8 @@ public class CustomView extends View {
     private float maxD;//最大直径
     private  float maxnum;
     private float mleveleachwords[];
-    private String addstring[];
     private float currentWidth,currentHeight;
+    private static TextPaint textPaint;
     private OnTagClickListener mListener;
     public static interface OnTagClickListener{
         void onClick(String tag);
@@ -64,6 +67,7 @@ public class CustomView extends View {
     {
         super(context,attrs);
         mpaint=new Paint(Paint.ANTI_ALIAS_FLAG);
+        textPaint = new TextPaint();
         Resources resources = this.getResources();
         DisplayMetrics dm = resources.getDisplayMetrics();
         mwidth = dm.widthPixels;
@@ -93,7 +97,6 @@ public class CustomView extends View {
         mx = new float[mstring.size()];
         my = new float[mstring.size()];
         mleveleachwords=new float[mstring.size()];
-        addstring=new String[mstring.size()];
         Log.d("MyView","two");
     }
 
@@ -114,34 +117,22 @@ public class CustomView extends View {
             //长度这样求会有问题，中英文表现不一致，中文还好，英文在圈圈内会偏左，所以我改成用Paint类自带的函数来求字符串长度了
            if(mnum[i]>maxnum)
                 { //大于maxnum个字就换行
-                    int num=(int)mnum[i]/2;
-                mlengthOfWords[i] = mpaint.measureText(mstring.get(i))/2;
-                    mr[i]=mlengthOfWords[i]*3/4;
-                   float len=mstring.get(i).length();
-                   String s="";
-                    int count=0;
-                    for(int j=0;j<len;)
-                    {
-                        if(j+num>=len)
-                        {
-                            s+=mstring.get(i).substring(j,(int)len);
-                            count++;
-                            break;
-                        }
-                        else{
-                            // TODO: 2018/2/2   加换行符
-                            s+=mstring.get(i).substring(j,j+num)+"$";
-                            j+=num;
-                           count++;
-                        }
+                    int num=(int)mnum[i];
+                    int count=1;
+                    do{
+                        num=num/2;
+                        count++;
                     }
+                    while(num>maxnum);
+
                     mleveleachwords[i]=count;
-                    addstring[i]=s;
+                mlengthOfWords[i] = mpaint.measureText(mstring.get(i))/mleveleachwords[i];
+                    mr[i]=mlengthOfWords[i]*3/4;
                 }
            else{
                mlengthOfWords[i]=mpaint.measureText(mstring.get(i));
                mr[i]=mlengthOfWords[i]*2/3;
-               addstring[i]=mstring.get(i);
+
            }
 
             if(maxD<mr[i]*2)
@@ -164,17 +155,29 @@ public class CustomView extends View {
                 currentHeight+=maxD+50;
             }
             mpaint.setColor(Color.GRAY);
-            canvas.drawCircle(currentWidth+mr[i],currentHeight+mr[i],mr[i]+mleveleachwords[i]*5,mpaint);
+            canvas.drawCircle(currentWidth+mr[i]+mleveleachwords[i]*5,currentHeight+mr[i]+mleveleachwords[i]*5,mr[i]+mleveleachwords[i]*5,mpaint);
             mx[i] = currentWidth+mr[i];
             my[i] = currentHeight+mr[i];
-            mpaint.setColor(Color.BLACK);
-            if(mleveleachwords[i]!=0)
-            canvas.drawText(addstring[i],currentWidth+mr[i]-(mlengthOfWords[i]/2),currentHeight+mr[i]-(mleveleachwords[i]*4),mpaint);
+            textPaint.setColor(Color.BLACK);
+            textPaint.setTextSize(mwordSize);
+           textPaint.setAntiAlias(true);
+
+            if(mleveleachwords[i]!=0) {
+
+                StaticLayout layout = new StaticLayout(mstring.get(i), textPaint, (int) mlengthOfWords[i] , Layout.Alignment.ALIGN_NORMAL, 1.0F, 0.0F, true);
+                canvas.save();
+                canvas.translate(currentWidth+mr[i]-(mlengthOfWords[i]/3),currentHeight+(mr[i]-(mleveleachwords[i]*mwordSize*2/3)));//从100，100开始画
+                layout.draw(canvas);
+                canvas.restore();//别忘了restore
+            }
             else{
-                canvas.drawText(addstring[i],currentWidth+mr[i]-(mlengthOfWords[i]/2),currentHeight+mr[i]+(mwordSize*1/3),mpaint);
+                StaticLayout layout = new StaticLayout(mstring.get(i), textPaint, (int) mlengthOfWords[i], Layout.Alignment.ALIGN_NORMAL, 1.0F, 0.0F, true);
+                canvas.save();
+                canvas.translate(currentWidth+mr[i]-(mlengthOfWords[i]/2),currentHeight+(mr[i]-mwordSize*2/3));//从100，100开始画
+                layout.draw(canvas);
+                canvas.restore();//别忘了restore
             }
             currentWidth+=mr[i]*2+50;
-
         }
 
     }
