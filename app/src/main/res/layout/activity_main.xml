@@ -51,7 +51,10 @@
             android:layout_weight="1"
             android:background="@android:color/transparent"
             android:maxLines="1"
-            android:textCursorDrawable="@drawable/color_cursor"/>
+            android:textCursorDrawable="@drawable/color_cursor"
+            android:inputType="text"
+            android:maxLength="15"
+            />
 
         <Button
             android:id="@+id/submit"
@@ -61,8 +64,12 @@
             android:background="@drawable/findstate"
             android:textSize="10sp"/>
     </LinearLayout>
-    <com.example.hu.a20180126.CustomView
-        android:id = "@+id/custom_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <com.example.hu.a20180126.CustomView
+            android:id = "@+id/custom_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </ScrollView>
 </LinearLayout>

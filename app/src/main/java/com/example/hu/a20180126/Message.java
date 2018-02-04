@@ -6,7 +6,6 @@ import org.litepal.crud.DataSupport;
 /**
  * Created by hu on 2018/1/26.
  */
-// TODO: 2018/2/2 准备加一个接受时间时间字段
 // TODO: 2018/2/2 如果要支持一个短信多个tag的话应该怎样建表？
 public class Message extends DataSupport{
     @Column(nullable = false)

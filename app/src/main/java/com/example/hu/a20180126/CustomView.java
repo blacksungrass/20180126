@@ -19,8 +19,6 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO: 2018/2/2 要考虑下如果tag太多，level太多以至于页面不够长，放不下的情况
-// TODO: 2018/2/2 要考虑tag非常长的情况下应如何表现
 public class CustomView extends View {
     private Paint mpaint;
     private float mwidth;
@@ -38,27 +36,39 @@ public class CustomView extends View {
     private float currentWidth,currentHeight;
     private static TextPaint textPaint;
     private OnTagClickListener mListener;
+    private boolean mclickFlag = false;
     public interface OnTagClickListener{
         void onClick(String tag);
     }
     @Override
-    public boolean onFilterTouchEventForSecurity(MotionEvent event) {
-        if(event.getAction()==MotionEvent.ACTION_DOWN){
-            float x = event.getX();
-            float y = event.getY();
-            for(int i=0;i<mstring.size();i++){
-                float xx = Math.abs(x-mx[i]);
-                float yy = Math.abs(y-my[i]);
-                if(Math.pow(xx,2)+Math.pow(yy,2)<=mr[i]*mr[i]){
-                    if(mListener!=null)
-                        mListener.onClick(mstring.get(i));
-                    break;
+    public boolean onTouchEvent(MotionEvent event) {
+        //return super.onTouchEvent(event);
+        float x = event.getX();
+        float y = event.getY();
+        int action = event.getAction();
+        switch(action){
+            case MotionEvent.ACTION_UP:
+                if(mclickFlag){
+                    for(int i=0;i<mstring.size();i++){
+                        float xx = Math.abs(x-mx[i]);
+                        float yy = Math.abs(y-my[i]);
+                        if(Math.pow(xx,2)+Math.pow(yy,2)<=mr[i]*mr[i]){
+                            if(mListener!=null)
+                                mListener.onClick(mstring.get(i));
+                            break;
+                        }
+                    }
                 }
-            }
+                mclickFlag = false;
+                break;
+            case MotionEvent.ACTION_DOWN:
+                mclickFlag = true;
+                break;
+            default:
+                mclickFlag = false;
         }
         return true;
     }
-
     public CustomView(Context context, AttributeSet attrs)
     {
         super(context,attrs);
@@ -75,14 +85,17 @@ public class CustomView extends View {
 
     }
 
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec),(int)(currentHeight+maxD+50));
+    }
+
     public void setOnClickListener(OnTagClickListener listener){
         mListener = listener;
     }
 
     public void addView(List<String> string){
         //我也不确定要不要加这个。。。
-        Log.d("mydebug", "addView: the number of string :"+String.valueOf(string.size()));
-        invalidate();
         mstring.clear();
         for(int i=string.size()-1;i>=0;i--)
            mstring.add(string.get(i));
@@ -93,14 +106,13 @@ public class CustomView extends View {
         my = new float[mstring.size()];
         mtextHeight = new float[mstring.size()];
         mtextWidth = new float[mstring.size()];
+        invalidate();
         Log.d("MyView","two");
     }
-
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        Log.d("CustomView:","three");
         currentHeight=50;
         currentWidth=50;
         textPaint.setColor(Color.BLACK);

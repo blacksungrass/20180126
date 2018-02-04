@@ -62,7 +62,6 @@ public class ShowMessageActivity extends AppCompatActivity {
                 message.setTag(tag);
                 message.save();
             }
-            // TODO: 2018/2/2 新建完tag以后最好能在直接回到MainActivity时刷新，显示最新添加的tag 
             setResult(2);
             finish();
         }

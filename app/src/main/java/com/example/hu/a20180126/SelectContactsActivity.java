@@ -56,7 +56,6 @@ public class SelectContactsActivity extends AppCompatActivity implements View.On
         data = new ArrayList<>();
         rdata = new ArrayList<>();
 
-
         //动态申请权限
         if(ContextCompat.checkSelfPermission(SelectContactsActivity.this, Manifest.permission.READ_CONTACTS)!= PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(SelectContactsActivity.this,new String[]{Manifest.permission.READ_CONTACTS},2);
@@ -64,7 +63,6 @@ public class SelectContactsActivity extends AppCompatActivity implements View.On
             //两个循环是为了让在通讯录中的号码优先显示
             for(String i:rawData){
                 String t= getDisplayNameByNumber(i);
-
                 if(!"".equals(t)){
                     data.add(t);
                     rdata.add(i);
@@ -79,8 +77,6 @@ public class SelectContactsActivity extends AppCompatActivity implements View.On
             }
         }
 
-
-        // TODO: 2018/2/2  试验下动态权限申请是否是异步的 
         recyclerView.setAdapter(new ContectAdapter(data,rdata,this,tag));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
@@ -90,11 +86,6 @@ public class SelectContactsActivity extends AppCompatActivity implements View.On
         back = (Button)findViewById(R.id.back);
         back.setOnClickListener(this);
     }
-    //http://blog.csdn.net/guolin_blog/article/details/51763825
-    //学到了，我的手机版本太低，我说怎么看不出来。。
-    //btw：为啥MainActivity里面没有这个函数，第一个不需要沉浸式嘛。。
-    //这个重载好像没有用了，额，忘删了，用了initScreen这个函数
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -112,13 +103,12 @@ public class SelectContactsActivity extends AppCompatActivity implements View.On
                         }
                     }
                     for(String i:rawData){
-                            String t= getDisplayNameByNumber(i);
+                        String t= getDisplayNameByNumber(i);
                         if("".equals(t)){
                             data.add(i);
                             rdata.add(i);
                         }
                     }
-                    // TODO: 2018/2/2  允许读取联系人后加载界面
                     recyclerView.setAdapter(new ContectAdapter(data,rdata,this,tag));
                     recyclerView.setLayoutManager(new LinearLayoutManager(this));
                 }
