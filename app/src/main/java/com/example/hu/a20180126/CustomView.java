@@ -28,7 +28,6 @@ public class CustomView extends View {
     private List<String> mstring;
     private float mwordSize;//字的大小
     private float mnum[];//tag字符串字数
-    private float mlengthOfWords[];//tag长度
     private float mr[];//半径
     private float mx[];//X坐标
     private float my[];//Y坐标
@@ -82,12 +81,12 @@ public class CustomView extends View {
 
     public void addView(List<String> string){
         //我也不确定要不要加这个。。。
+        Log.d("mydebug", "addView: the number of string :"+String.valueOf(string.size()));
         invalidate();
         mstring.clear();
         for(int i=string.size()-1;i>=0;i--)
            mstring.add(string.get(i));
         mnum = new float[mstring.size()];
-        mlengthOfWords = new float[mstring.size()];
         mr = new float[mstring.size()];
         maxD = 0;
         mx = new float[mstring.size()];
@@ -117,14 +116,15 @@ public class CustomView extends View {
                 num /= 2;
                 count++;
             }
+            Log.d("mydebug", "onDraw: the string is: "+mstring.get(i));
             Log.d("mydebug", "onDraw: count = "+String.valueOf(count));
             //宽度限制放宽一个汉字的宽度（两个英文字符）
             mtextWidth[i] = mpaint.measureText(mstring.get(i))/count+mpaint.measureText("  ");
-            Log.d("mydebug", "onDraw: mtextWidth[i] = "+String.valueOf(mtextWidth[i]));
+            //Log.d("mydebug", "onDraw: mtextWidth[i] = "+String.valueOf(mtextWidth[i]));
             mtextHeight[i] = (textPaint.getFontMetrics().bottom-textPaint.getFontMetrics().top)*count;
-            Log.d("mydebug", "onDraw: mtextHeight[i] = "+String.valueOf(mtextHeight[i]));
+            //Log.d("mydebug", "onDraw: mtextHeight[i] = "+String.valueOf(mtextHeight[i]));
             mr[i] = Math.max(mtextHeight[i],mtextWidth[i])*0.8F;
-            Log.d("mydebug", "onDraw: mr[i] = "+String.valueOf(mr[i]));
+            //Log.d("mydebug", "onDraw: mr[i] = "+String.valueOf(mr[i]));
             if(maxD<mr[i]*2)
             {
                     maxD=mr[i]*2;
@@ -183,13 +183,6 @@ public class CustomView extends View {
         this.mnum = mnum;
     }
 
-    public float[] getMlengthOfWords() {
-        return mlengthOfWords;
-    }
-
-    public void setMlengthOfWords(float[] mlengthOfWords) {
-        this.mlengthOfWords = mlengthOfWords;
-    }
 
     public float[] getMr() {
         return mr;
